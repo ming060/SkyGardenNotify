@@ -73,7 +73,7 @@ class SkyGardenSpider(scrapy.Spider):
 
 	def parse_today (self, response):
 		today_td = response.xpath("//td[@class='ng-scope available selected today']")
-		if today_td is None:
+		if len(today_td) == 0:
 			return None
 
 		day_of_today = today_td.xpath("./div/text()").extract_first()
