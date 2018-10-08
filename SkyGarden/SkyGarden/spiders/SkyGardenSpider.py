@@ -106,7 +106,8 @@ end
 		# self.logger.info("next_month_availiable_dates: %s", next_month_availiable_dates)
 
 		total_availiable_date_count = len(current_month_availiable_dates) + len(next_month_availiable_dates)
-		total_availiable_date_count += 1 # today
+		if today is not None:
+			total_availiable_date_count += 1
 
 		available_dates = []
 		# for day in current_month_availiable_dates:
@@ -118,13 +119,16 @@ end
 			"total_availiable_date_count" : total_availiable_date_count,
 			"resfresh_time" : time,
 			"splash_parse_time" : splash_parse_time,
-			# "today" : today,
+			"today" : today,
 			"month_count" : month_count,
 			"available_dates" : available_dates,
 		}
 
 	def parse_today (self, response):
 		today_td = response.xpath("//td[@class='ng-scope available selected today']")
+		if today_td is None:
+			return None
+
 		day_of_today = today_td.xpath("./div/text()").extract_first()
 		current_month = today_td.xpath("./ancestor::div[@class='bb-months']//div[@class='month-pic-heading text-center col-xs-4 visible-xs']/b/text()").extract_first()
 		return self.date_string(self.process_month_string(current_month), day_of_today)
