@@ -42,24 +42,25 @@ class SkyGardenSpider(scrapy.Spider):
 		today = self.parse_today(response)
 
 		current_month_selector = response.xpath("//div[@class='bb-month ng-scope slick-slide slick-current slick-active']")
-		# current_month = self.get_month_string(current_month_selector)
+		current_month = self.get_month_string(current_month_selector)
 		current_month_availiable_dates = current_month_selector.xpath(".//td[@class='ng-scope available']/div/text()").extract()
-		# self.logger.info("current_month_availiable_dates: %s", current_month_availiable_dates)
-
-		next_month_selector = response.xpath("//div[@class='bb-month ng-scope slick-slide slick-active']")
-		# next_month = self.get_month_string(next_month_selector)
-		next_month_availiable_dates = next_month_selector.xpath(".//td[@class='ng-scope available']/div/text()").extract()
-		# self.logger.info("next_month_availiable_dates: %s", next_month_availiable_dates)
-
-		total_availiable_date_count = len(current_month_availiable_dates) + len(next_month_availiable_dates)
-		if today is not None:
-			total_availiable_date_count += 1
 
 		available_dates = []
-		# for day in current_month_availiable_dates:
-		# 	available_dates.append(self.date_string(current_month, day))
-		# for day in next_month_availiable_dates:
-		# 	available_dates.append(self.date_string(next_month, day))
+		for day in current_month_availiable_dates:
+			available_dates.append(self.date_string(current_month, day))
+
+		total_availiable_date_count = len(current_month_availiable_dates)
+
+		next_month_selector = response.xpath("//div[@class='bb-month ng-scope slick-slide slick-active']")
+		if len(next_month_selector) != 0:
+			next_month = self.get_month_string(next_month_selector)
+			next_month_availiable_dates = next_month_selector.xpath(".//td[@class='ng-scope available']/div/text()").extract()
+			for day in next_month_availiable_dates:
+				available_dates.append(self.date_string(next_month, day))
+			total_availiable_date_count += len(next_month_availiable_dates)
+
+		if today is not None:
+			total_availiable_date_count += 1
 
 		yield {
 			"total_availiable_date_count" : total_availiable_date_count,
